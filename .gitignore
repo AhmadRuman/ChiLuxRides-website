@@ -1,0 +1,44 @@
+# Private environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.npmrc
+
+# Dependencies and generated build output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.vite/
+
+# Logs, backups, and private data exports
+*.log
+*.dump
+*.backup
+*.sqlite
+*.sqlite3
+*.db
+*.csv
+*.zip
+backups/
+database-exports/
+
+# Workspace/private material
+.agents/
+.local/
+.cache/
+.config/
+attached_assets/
+screenshots/
+.replit
+.replitignore
+
+# Editor/system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
