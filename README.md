@@ -1,158 +1,146 @@
-# ChiLuxRides — Transportation Booking Website
+# ChiLuxRides
 
-A portfolio source snapshot of a luxury transportation website for Chicago
-and the surrounding suburbs.
+### Luxury Transportation Website & Booking Platform
+
+A full-stack transportation booking website for Chicago and the surrounding suburbs. The project combines a responsive customer-facing website with fare calculation, booking requests, payment processing, and administrative tools.
 
 ## Features
 
-- Responsive React website with fleet, airport, service, and policy pages
+### Customer Experience
+
+- Responsive layouts for desktop, tablet, and mobile
+- Fleet, airport, service-area, and policy pages
 - Airport, point-to-point, hourly, and custom-request booking flows
-- Itemized fares, payment schedules, child-seat options, and promo codes
+- Itemized fare breakdowns and deposit payment schedules
+- Child-seat options and promotional codes
 - Required agreement to privacy, terms, and cancellation policies
-- Stripe-backed deposit and saved-card payment workflows
-- Administrative booking, driver, promo-code, and extra-charge controls
-- Email notifications through Resend
 
-## Technology
+### Payments & Notifications
 
-- React, TypeScript, Vite, and Tailwind CSS
-- React Hook Form, Zod, and TanStack Query
-- Express API server
-- PostgreSQL and Drizzle ORM
-- OpenAPI-generated API client and validation schemas
-- Stripe, Google Maps, and Resend integrations
-- pnpm workspace monorepo
+- Stripe-backed deposits and saved-card payment workflows
+- Remaining-balance and additional-charge management
+- Booking email notifications through Resend
+- Google Maps integration for address and route-related functionality
 
-## Project layout
+### Administration
+
+- Administrative sign-in
+- Booking review and management
+- Driver assignment and management
+- Promotional-code management
+- Additional-charge controls
+
+## Technology Stack
+
+| Layer | Technologies |
+| --- | --- |
+| Frontend | React, TypeScript, Vite, Tailwind CSS |
+| Forms & validation | React Hook Form, Zod |
+| API state | TanStack Query |
+| Backend | Node.js, Express |
+| Database | PostgreSQL, Drizzle ORM |
+| API contract | OpenAPI with generated clients and validation schemas |
+| Integrations | Stripe, Google Maps, Resend |
+| Workspace | pnpm monorepo |
+
+## Project Structure
 
 ```text
-artifacts/suv-transport/  Website
-artifacts/api-server/     Express API
-lib/api-spec/             OpenAPI contract and code generation
-lib/api-client-react/     Generated frontend API client
-lib/api-zod/              Generated API validation
-lib/db/                   Database connection and schema definitions
-scripts/                  General workspace scripts
+artifacts/
+  suv-transport/        React website
+  api-server/           Express API
+lib/
+  api-spec/             OpenAPI contract and code generation
+  api-client-react/     Generated frontend API client
+  api-zod/              Generated API validation schemas
+  db/                   Database connection and schema definitions
+scripts/                Workspace utilities
 ```
 
-## About this public source copy
+## Getting Started
 
-This is a separately prepared copy, not an export of the production database.
-It does not contain credentials, Git history, customer bookings, database
-backups, workspace notes, raw uploads, or build output.
+### Prerequisites
 
-The business branding, public website addresses, public contact information,
-pricing rules, and public website images are intentionally retained.
-Database schema definitions describe the application structure; they are not
-customer records.
+- A current Node.js release and pnpm
+- A PostgreSQL development database
+- Your own credentials for the integrations you want to use
+- A routing configuration that forwards `/api` requests to the Express server
 
-Differences from the working project:
+### Install Dependencies
 
-- Customer-review seed data has been replaced with a clearly labeled synthetic example.
-- Original analytics IDs and site-verification files/tokens have been removed.
-- Image EXIF/XMP/IPTC and text/comment metadata has been removed where supported.
-- The exported admin code requires an explicitly configured session secret;
-  its development fallback was removed.
-- Replit workspace/deployment metadata and the design mockup sandbox are excluded.
-
-The original working website was not modified.
-
-## Setup expectations
-
-Use a current Node.js release and pnpm. Install dependencies with:
+From the repository root:
 
 ```sh
 pnpm install --frozen-lockfile
 ```
 
-See `.env.example` for variable names. Its values are intentionally blank.
-Configure your own credentials privately; never commit a filled-in environment
-file. This example file is documentation, not an automatic secrets loader for
-all workspace packages.
+### Configure the Environment
 
-The original application uses Replit-managed routing and integrations. For a
-new Replit project, recreate the API routing, PostgreSQL database, environment
-configuration, and Stripe/Resend connections. Outside Replit, adapt the
-connector-backed email client and configure an API reverse proxy.
+Use `.env.example` as a reference for the required environment-variable names. Supply values through private environment configuration; do not commit credentials.
 
-On a **new, empty development database**, the schema can be applied with:
+The example file does not automatically load configuration into every workspace package. Make the required variables available to each process before starting it.
+
+The application was developed with Replit-managed routing and integrations. When running it elsewhere, configure an API reverse proxy and adapt the connector-backed email integration to your environment.
+
+### Initialize a Development Database
+
+Apply the schema only to a **new, empty development database**:
 
 ```sh
 pnpm --filter @workspace/db run push
 ```
 
-Do not run this command against an existing or production database without
-reviewing the proposed changes.
+Review proposed schema changes before using this command with an existing database. Do not apply development commands directly to production.
 
-Useful commands:
+### Start the Application
+
+Run the API server:
 
 ```sh
-# Refresh generated API schemas/client after changing the OpenAPI contract
+PORT=8080 pnpm --filter @workspace/api-server run dev
+```
+
+In a separate terminal, start the website:
+
+```sh
+PORT=5173 BASE_PATH=/ pnpm --filter @workspace/suv-transport run dev
+```
+
+These examples use Unix-style environment-variable syntax.
+
+For end-to-end functionality, configure `/api` on the frontend origin to forward to the API server. Starting both processes does not automatically establish that routing.
+
+## Development Commands
+
+```sh
+# Regenerate API clients and validation schemas after contract changes
 pnpm --filter @workspace/api-spec run codegen
 
-# Check shared-library types
+# Type-check shared libraries
 pnpm run typecheck:libs
 
-# API process, after configuring its database and secrets
-PORT=8080 pnpm --filter @workspace/api-server run dev
+# Type-check the frontend
+pnpm --filter @workspace/suv-transport run typecheck
 
-# Website development process
-PORT=5173 BASE_PATH=/ pnpm --filter @workspace/suv-transport run dev
-
-# Website production build
+# Build the website for production
 PORT=5173 BASE_PATH=/ pnpm --filter @workspace/suv-transport run build
 ```
 
-For local end-to-end use, route `/api` from the frontend origin to the Express
-process. Starting the two processes alone does not create that routing.
-Mail and payments need your own integrations; use test-mode credentials and
-synthetic customer data while evaluating the project.
+## Project Status
 
-This is a full-stack application, not a standalone GitHub Pages site.
+This repository is a portfolio version of the application. Payment, mapping, and email features require separately configured service accounts.
 
-## Uploading the showcase to GitHub
+The website production build succeeds. The full frontend typecheck currently reports existing vehicle-category and SEO-property typing issues.
 
-1. Extract the ZIP and open the `chiluxrides-github-showcase` folder.
-2. Create a new **private** GitHub repository.
-3. Upload the extracted folder's contents, including `.gitignore` and
-   `.env.example`. GitHub Desktop is convenient for uploading the full folder;
-   browser uploads may need smaller batches because of file-count limits.
-   Do not upload the ZIP itself as the source repository.
-4. Review the files on GitHub, particularly any files you add afterward.
-5. Make the repository public only when satisfied with that review.
+This is a full-stack application, not a standalone static site for GitHub Pages. Deploying it requires a frontend, API server, database, and integration configuration.
 
-Alternatively, initialize a fresh Git repository in the extracted folder:
+## Security & Development Practices
 
-```sh
-git init
-git add .
-git status
-git commit -m "Add transportation website portfolio source"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
-git push -u origin main
-```
+- Keep API secrets, database credentials, and administrator credentials outside version control.
+- Use Stripe test mode and fictional customer information during development.
+- Seeded testimonial content in this repository is demonstration data.
+- Review dependencies, access controls, API-key restrictions, and deployment settings before production use.
 
-Only substitute your public GitHub username and repository name in that URL.
-Authenticate through GitHub's normal tools; do not put an access token in
-the URL or project files.
+## Branding & Assets
 
-## Security and limitations
-
-Read `PUBLICATION_REVIEW.md` before deploying this copy.
-Secret-pattern scanning found no embedded credentials in the packaged source.
-That is not a guarantee against every possible secret, nor a production
-security certification.
-
-A separate project-wide dependency audit reported vulnerable dependencies.
-These were not upgraded as part of preparing this source ZIP. Review and
-remediate them before deploying a new instance.
-
-The original full frontend typecheck also has three existing errors involving
-vehicle-category types and an SEO component property. Preparing this copy did
-not fix unrelated application issues.
-
-## Image and brand rights
-
-Images and branding are included to show the original project. Their presence
-does not grant permission to reuse third-party content or trademarks.
+Branding and images are included to demonstrate the project. Their inclusion does not grant permission to reuse third-party content or trademarks.
